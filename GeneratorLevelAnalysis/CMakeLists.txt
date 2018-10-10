@@ -3,7 +3,7 @@ set( ROOTLIB -L$ENV{ROOTSYS}/lib -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpa
 link_libraries( -L$ENV{BOOST_LIB} -lboost_system ${ROOTLIB})
 
 art_make(
-          LIBRARY_NAME generator_level_analysis
+          LIBRARY_NAME GeneratorLevelAnalysis
           LIB_LIBRARIES
                         larpandora_LArPandoraInterface
                         lardataobj_RecoBase
@@ -73,7 +73,7 @@ art_make(
                         ${ROOT_GDML}
                         ${ROOT_BASIC_LIB_LIST}
                         ${SIMULATIONBASE}
-                        generator_level_analysis
+                        GeneratorLevelAnalysis
 )
 
 add_subdirectory(job)
