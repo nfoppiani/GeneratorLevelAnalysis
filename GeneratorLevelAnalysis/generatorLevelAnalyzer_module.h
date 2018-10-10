@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////
-// Class:       generator_level_analyzer
+// Class:       generatorLevelAnalyzer
 // Plugin Type: analyzer (art v2_05_01)
-// File:        generator_level_analyzer_module.cc
+// File:        generatorLevelAnalyzer_module.cc
 //
 // Generated at Wed Feb 14 10:17:20 2018 by Nicolo Foppiani using cetskelgen
 // from cetlib version v1_21_00.
@@ -11,7 +11,7 @@
 #include <iostream>
 #include <memory>
 
-#include "art/Framework/Core/EDFilter.h"
+#include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
@@ -20,11 +20,9 @@
 #include "canvas/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "ElectronEventSelectionAlg.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "larcoreobj/SummaryData/POTSummary.h"
 #include "TTree.h"
-#include "TH1F.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "larevt/SpaceChargeServices/SpaceChargeService.h"
@@ -32,29 +30,39 @@
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "lardata/DetectorInfo/DetectorProperties.h"
 
+#include "canvas/Persistency/Common/FindOneP.h"
+#include "canvas/Persistency/Common/FindManyP.h"
 
-class generator_level_analyzer;
+#include "lardataobj/RecoBase/PFParticle.h"
+#include "lardataobj/RecoBase/Vertex.h"
+#include "lardataobj/RecoBase/OpFlash.h"
 
-class generator_level_analyzer : public art::EDAnalyzer
+#include "uboone/EventWeight/MCEventWeight.h"
+
+#include "PandoraInterfaceHelper.h"
+
+class generatorLevelAnalyzer;
+
+class generatorLevelAnalyzer : public art::EDAnalyzer
 {
 public:
-  explicit ElectronNeutrinoFilter(fhicl::ParameterSet const & p);
+  explicit generatorLevelAnalyzer(fhicl::ParameterSet const &p);
   // The compiler-generated destructor is fine for non-base
   // classes without bare pointers or other resource use.
 
   // Plugins should not be copied or assigned.
-  ElectronNeutrinoFilter(ElectronNeutrinoFilter const &) = delete;
-  ElectronNeutrinoFilter(ElectronNeutrinoFilter &&) = delete;
-  ElectronNeutrinoFilter & operator = (ElectronNeutrinoFilter const &) = delete;
-  ElectronNeutrinoFilter & operator = (ElectronNeutrinoFilter &&) = delete;
+  generatorLevelAnalyzer(generatorLevelAnalyzer const &) = delete;
+  generatorLevelAnalyzer(generatorLevelAnalyzer &&) = delete;
+  generatorLevelAnalyzer & operator = (generatorLevelAnalyzer const &) = delete;
+  generatorLevelAnalyzer & operator = (generatorLevelAnalyzer &&) = delete;
 
   // Required functions.
-  bool analyze(art::Event & evt) override;
+  void analyze(art::Event const &evt) override;
 
   // Selected optional functions.
-  void reconfigure(fhicl::ParameterSet const & p) override;
+  void reconfigure(fhicl::ParameterSet const &p) override;
   void respondToOpenInputFile(art::FileBlock const &fb) override;
-  bool endSubRun(art::SubRun &sr) override;
+  bool endSubRun(art::SubRun &sr);
   void clear();
 
   /// Additional functions
@@ -66,6 +74,13 @@ public:
 private:
   std::string _mctruthLabel = "generator";
   std::string _mcparticleLabel = "largeant";
+
+  lee::PandoraInterfaceHelper pandoraHelper;
+
+  bool m_isOverlaidSample;
+  bool m_isData;
+  std::string m_opticalFlashFinderLabel;
+  std::string m_pfp_producer;
 
   TTree *myPOTTTree;
   std::ofstream _run_subrun_list_file;
@@ -109,4 +124,6 @@ private:
   double _true_daughter_theta;
   double _true_daughter_phi;
   double _true_daughter_T;
+
+  std::map<int, int> _pdg_daughter = {{12, 11}, {14, 13}, {-12, -11}, {-14, -13}};
 };

@@ -2,15 +2,15 @@
 
 BEGIN_PROLOG
 
-generator_level_analyzer:
+loc_generatorLevelAnalyzer:
 {
-    module_type:                "generator_level_analyzer"
+    module_type:                "generatorLevelAnalyzer"
 }
 
 END_PROLOG
 
 
-process_name: generator_level_analyzer      #The process name must NOT contain any underscores
+process_name: generatorLevelAnalyzer      #The process name must NOT contain any underscores
 
 source:
 {
@@ -21,7 +21,7 @@ source:
 services: {
 
   scheduler:               { defaultExceptions: false }    # Make all uncaught exceptions fatal.
-  TFileService: { fileName: "generator_level_analyzer.root" }
+  TFileService: { fileName: "generatorLevelAnalyzer.root" }
   @table::microboone_services_reco
   #@table::microboone_simulation_services
   #TPCEnergyCalibService:         @local::microboone_tpcenergycalib_service
@@ -65,7 +65,7 @@ physics: {
   }
   analyzers: {
      # ParameterSets for zero or more analyzer modules
-     generator_level_analyzer: @local::generator_level_analyzer
+     myanalyzer: @local::loc_generatorLevelAnalyzer
   }
 
   filters: {
@@ -75,7 +75,7 @@ physics: {
   # analyzeIt:[
   #
   #           ]
-  path0: [ generator_level_analyzer ]
+  path0: [ myanalyzer ]
   stream: [ out0 ]
   #path1 : [  comma separated list of module labels of producer or filter modules  ]
   #path2 : [  comma separated list of module labels of analyzer or output modules  ]

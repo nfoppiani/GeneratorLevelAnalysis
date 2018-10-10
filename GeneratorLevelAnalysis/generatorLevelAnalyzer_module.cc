@@ -1,16 +1,18 @@
 ////////////////////////////////////////////////////////////////////////
-// Class:       generator_level_analyzer
+// Class:       generatorLevelAnalyzer
 // Plugin Type: analyzer (art v2_05_01)
-// File:        generator_level_analyzer_module.cc
+// File:        generatorLevelAnalyzer_module.cc
 //
 // Generated at Wed Feb 14 10:17:20 2018 by Nicolo Foppiani using cetskelgen
 // from cetlib version v1_21_00.
 ////////////////////////////////////////////////////////////////////////
 
-#include "generator_level_analyzer.h"
+#include "generatorLevelAnalyzer_module.h"
 
-generator_level_analyzer::generator_level_analyzer(fhicl::ParameterSet const &p)
+generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
+    : EDAnalyzer(p)
 {
+  art::ServiceHandle<art::TFileService> tfs;
   myPOTTTree = tfs->make<TTree>("pot", "POT Tree");
   myPOTTTree->Branch("pot", &_pot, "pot/D");
   myPOTTTree->Branch("run", &_run_sr, "run/i");
@@ -47,29 +49,30 @@ generator_level_analyzer::generator_level_analyzer(fhicl::ParameterSet const &p)
   myTTree->Branch("n_true_protons", &_n_true_protons, "n_true_protons/i");
   myTTree->Branch("n_true_protons_above40", &_n_true_protons_above40, "n_true_protons_above40/i");
   myTTree->Branch("n_true_protons_above21", &_n_true_protons_above21, "n_true_protons_above21/i");
-  myTTree->Branch("true_daughter_E", &_true_daughter_E, "true_daughter_E/D");
-  myTTree->Branch("true_daughter_theta", &_true_daughter_theta, "true_daughter_theta/D");
-  myTTree->Branch("true_daughter_phi", &_true_daughter_phi, "true_daughter_phi/D");
-  myTTree->Branch("true_daughter_T", &_true_daughter_T, "true_daughter_T/D");
+  myTTree->Branch("true_daughter_E", &_true_daughter_E, "true_daughter_E/d");
+  myTTree->Branch("true_daughter_theta", &_true_daughter_theta, "true_daughter_theta/d");
+  myTTree->Branch("true_daughter_phi", &_true_daughter_phi, "true_daughter_phi/d");
+  myTTree->Branch("true_daughter_T", &_true_daughter_T, "true_daughter_T/d");
 
   _run_subrun_list_file.open("run_subrun_list_filter.txt", std::ofstream::out | std::ofstream::trunc);
 
   this->reconfigure(p);
 }
 
-void generator_level_analyzer::reconfigure(fhicl::ParameterSet const &p)
+void generatorLevelAnalyzer::reconfigure(fhicl::ParameterSet const &p)
 {
   m_opticalFlashFinderLabel = p.get<std::string>("OpticalFlashFinderLabel", "simpleFlashBeam");
+  m_pfp_producer = p.get<std::string>("PFParticleProducer", "pandoraNu");
   m_isOverlaidSample = p.get<bool>("isOverlaidSample", false);
   m_isData = p.get<bool>("isData", false);
 }
 
-void generator_level_analyzer::respondToOpenInputFile(art::FileBlock const &fb)
+void generatorLevelAnalyzer::respondToOpenInputFile(art::FileBlock const &fb)
 {
     _sum_pot = 0;
 }
 
-bool generator_level_analyzer::endSubRun(art::SubRun &sr)
+bool generatorLevelAnalyzer::endSubRun(art::SubRun &sr)
 {
   _run_subrun_list_file << sr.run() << " " << sr.subRun() << std::endl;
 
@@ -104,7 +107,7 @@ bool generator_level_analyzer::endSubRun(art::SubRun &sr)
   return true;
 }
 
-void generator_level_analyzer::clear()
+void generatorLevelAnalyzer::clear()
 {
   // pot information
   _pot = std::numeric_limits<double>::lowest();
@@ -155,7 +158,7 @@ void generator_level_analyzer::clear()
 
 }
 
-void generator_level_analyzer::storeBNBWeight(art::Event const &evt)
+void generatorLevelAnalyzer::storeBNBWeight(art::Event const &evt)
 {
   if (!evt.isRealData() || m_isOverlaidSample)
   {
@@ -165,7 +168,6 @@ void generator_level_analyzer::storeBNBWeight(art::Event const &evt)
         evt.getValidHandle<std::vector<evwgh::MCEventWeight>>(eventweight_tag);
     if (!eventweights_handle.isValid())
     {
-      std::cout << "[PandoraLEEAnalyzer] No MCEventWeight data product" << std::endl;
       _bnbweight = 1;
     }
     else
@@ -193,7 +195,7 @@ void generator_level_analyzer::storeBNBWeight(art::Event const &evt)
   }
 }
 
-void generator_level_analyzer::opticalInformation(art::Event const &evt)
+void generatorLevelAnalyzer::opticalInformation(art::Event const &evt)
 {
   art::InputTag optical_tag{m_opticalFlashFinderLabel};
   auto const &optical_handle = evt.getValidHandle<std::vector<recob::OpFlash>>(optical_tag);
@@ -206,7 +208,7 @@ void generator_level_analyzer::opticalInformation(art::Event const &evt)
   }
 }
 
-void generator_level_analyzer::PNCandidatesInformation(art::Event const &evt)
+void generatorLevelAnalyzer::PNCandidatesInformation(art::Event const &evt)
 {
   auto const &pfparticle_handle =
       evt.getValidHandle<std::vector<recob::PFParticle>>(m_pfp_producer);
@@ -223,14 +225,16 @@ void generator_level_analyzer::PNCandidatesInformation(art::Event const &evt)
     {
       _n_total_candidates++;
       auto const &nu_candidate_vertex_obj = vertex_per_pfpart.at(_i_pfp);
-      _nu_candidate_vx.push_back(nu_candidate_vertex_obj.position().X());
-      _nu_candidate_vy.push_back(nu_candidate_vertex_obj.position().Y());
-      _nu_candidate_vz.push_back(nu_candidate_vertex_obj.position().Z());
+      double nu_candidate_vertex[3];
+      nu_candidate_vertex_obj->XYZ(nu_candidate_vertex);
+      _nu_candidate_vx.push_back(nu_candidate_vertex[0]);
+      _nu_candidate_vy.push_back(nu_candidate_vertex[1]);
+      _nu_candidate_vz.push_back(nu_candidate_vertex[2]);
     }
   }
 }
 
-void generator_level_analyzer::trueNeutrinoInformation(art::Event const &evt)
+void generatorLevelAnalyzer::trueNeutrinoInformation(art::Event const &evt)
 {
   auto const &generator_handle = evt.getValidHandle<std::vector<simb::MCTruth>>(_mctruthLabel);
   auto const &generator(*generator_handle);
@@ -273,7 +277,7 @@ void generator_level_analyzer::trueNeutrinoInformation(art::Event const &evt)
           mcparticle.StatusCode() == 1))
       continue;
 
-    const auto mc_truth = pandoraHelper.TrackIDToMCTruth(e, _mcparticleLabel, mcparticle.TrackId());
+    const auto mc_truth = pandoraHelper.TrackIDToMCTruth(evt, _mcparticleLabel, mcparticle.TrackId());
     if (mc_truth->Origin() == simb::kBeamNeutrino)
     {
       _nu_daughters_E.push_back(mcparticle.E());
@@ -317,19 +321,22 @@ void generator_level_analyzer::trueNeutrinoInformation(art::Event const &evt)
 
       _nu_daughters_end_v.push_back(end_v);
 
-      if (_ccnc==0 && mcparticle.PdgCode()==_pdg_daughter[_nu_pdg])
+      if (_ccnc==0)
       {
-        _true_daughter_E = mcparticle.E();
-        _true_daughter_theta = mcparticle.Momentum().Theta();
-        _true_daughter_phi = mcparticle.Momentum().Phi();
-        _true_daughter_T = mcparticle.Momentum().T();
+        if (mcparticle.PdgCode() == _pdg_daughter[_nu_pdg])
+        {
+          _true_daughter_E = mcparticle.E();
+          _true_daughter_theta = mcparticle.Momentum().Theta();
+          _true_daughter_phi = mcparticle.Momentum().Phi();
+          _true_daughter_T = mcparticle.T();
+        }
       }
 
     }
   }
 }
 
-void generator_level_analyzer::analyze(art::Event const &evt)
+void generatorLevelAnalyzer::analyze(art::Event const &evt)
 {
   clear();
   std::cout << "RUN " << evt.run() << " SUBRUN " << evt.subRun() << " EVENT " << evt.id().event()
@@ -354,4 +361,4 @@ void generator_level_analyzer::analyze(art::Event const &evt)
   myTTree->Fill();
 }
 
-DEFINE_ART_MODULE(generator_level_analyzer)
+DEFINE_ART_MODULE(generatorLevelAnalyzer)
