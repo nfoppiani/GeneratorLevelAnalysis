@@ -72,7 +72,7 @@ void generatorLevelAnalyzer::respondToOpenInputFile(art::FileBlock const &fb)
     _sum_pot = 0;
 }
 
-bool generatorLevelAnalyzer::endSubRun(art::SubRun &sr)
+void generatorLevelAnalyzer::endSubRun(art::SubRun const &sr)
 {
   _run_subrun_list_file << sr.run() << " " << sr.subRun() << std::endl;
 
@@ -104,7 +104,7 @@ bool generatorLevelAnalyzer::endSubRun(art::SubRun &sr)
   }
 
   myPOTTTree->Fill();
-  return true;
+  return;
 }
 
 void generatorLevelAnalyzer::clear()
@@ -358,6 +358,9 @@ void generatorLevelAnalyzer::analyze(art::Event const &evt)
   {
     trueNeutrinoInformation(evt);
   }
+    
+    endSubRun(evt.getSubRun());
+    
   myTTree->Fill();
 }
 

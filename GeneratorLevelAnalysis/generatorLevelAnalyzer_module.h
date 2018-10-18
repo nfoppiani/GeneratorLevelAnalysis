@@ -25,6 +25,8 @@
 #include "TTree.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/MCFlux.h"
+
 #include "larevt/SpaceChargeServices/SpaceChargeService.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
@@ -62,7 +64,7 @@ public:
   // Selected optional functions.
   void reconfigure(fhicl::ParameterSet const &p) override;
   void respondToOpenInputFile(art::FileBlock const &fb) override;
-  bool endSubRun(art::SubRun &sr);
+  void endSubRun(art::SubRun const &sr) override;
   void clear();
 
   /// Additional functions
