@@ -5,6 +5,7 @@ BEGIN_PROLOG
 loc_generatorLevelAnalyzer:
 {
     module_type:                "generatorLevelAnalyzer"
+    isData:                     true
 }
 
 END_PROLOG
@@ -65,7 +66,7 @@ physics: {
   }
   analyzers: {
      # ParameterSets for zero or more analyzer modules
-     myanalyzer: @local::loc_generatorLevelAnalyzer
+     genLevelAnalyzer: @local::loc_generatorLevelAnalyzer
   }
 
   filters: {
@@ -75,7 +76,7 @@ physics: {
   # analyzeIt:[
   #
   #           ]
-  path0: [ myanalyzer ]
+  path0: [ genLevelAnalyzer ]
   stream: [ out0 ]
   #path1 : [  comma separated list of module labels of producer or filter modules  ]
   #path2 : [  comma separated list of module labels of analyzer or output modules  ]

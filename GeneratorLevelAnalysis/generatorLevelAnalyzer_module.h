@@ -94,9 +94,12 @@ private:
   double _bnbweight;
 
   std::vector<double> _flash_PE, _flash_time;
+  std::vector<double> _flash_PE_simple, _flash_time_simple, _flash_y_simple, _flash_z_simple;
+  std::vector<double> _flash_PE_op, _flash_time_op, _flash_y_op, _flash_z_op;
 
   unsigned int _n_total_candidates;
   std::vector<double> _nu_candidate_vx, _nu_candidate_vy, _nu_candidate_vz;
+  std::vector<int> _n_daughters_candidate;
 
   unsigned int _n_true_nu;
   int _nu_pdg;
@@ -122,6 +125,7 @@ private:
   std::vector < std::vector<double> > _nu_daughters_p;
   std::vector < std::vector<double> > _nu_daughters_start_v;
   std::vector < std::vector<double> > _nu_daughters_end_v;
+  unsigned int _n_true_daughter_candidates;
   double _true_daughter_E;
   double _true_daughter_theta;
   double _true_daughter_phi;
