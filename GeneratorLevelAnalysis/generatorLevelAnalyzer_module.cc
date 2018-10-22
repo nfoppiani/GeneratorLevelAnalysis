@@ -24,6 +24,17 @@ generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
   myTTree->Branch("flash_PE", "std::vector< double >", &_flash_PE);
 
   myTTree->Branch("n_total_candidates", &_n_total_candidates, "n_total_candidates/i");
+    
+    myTTree->Branch("dk_x", &_dk_x, "dk_x/D");
+    myTTree->Branch("dk_y", &_dk_y, "dk_y/D");
+    myTTree->Branch("dk_z", &_dk_z, "dk_z/D");
+    myTTree->Branch("gen_x", &_gen_x, "gen_x/D");
+    myTTree->Branch("gen_y", &_gen_y, "gen_y/D");
+    myTTree->Branch("gen_z", &_gen_z, "gen_z/D");
+    myTTree->Branch("dk2gen", &_dk2gen, "dk2gen/D");
+    myTTree->Branch("gen2vtx", &_gen2vtx, "gen2vtx/D");
+
+    
   myTTree->Branch("nu_candidate_vx", "std::vector< double >", &_nu_candidate_vx);
   myTTree->Branch("nu_candidate_vy", "std::vector< double >", &_nu_candidate_vy);
   myTTree->Branch("nu_candidate_vz", "std::vector< double >", &_nu_candidate_vz);
@@ -236,6 +247,28 @@ void generatorLevelAnalyzer::PNCandidatesInformation(art::Event const &evt)
 
 void generatorLevelAnalyzer::trueNeutrinoInformation(art::Event const &evt)
 {
+    std::cout<<"***"<<std::endl;
+
+    auto const &fluxes_handle = evt.getValidHandle<std::vector<simb::MCFlux>>(_mctruthLabel);
+    auto const &fluxes(*fluxes_handle);
+    
+    //Assume there's only one MCFlux in the fluxes vector
+    if(fluxes.size()==1){
+        _dk_x = fluxes[0].fvx;
+        _dk_y = fluxes[0].fvy;
+        _dk_z = fluxes[0].fvz;
+        
+        _gen_x = fluxes[0].fgenx;
+        _gen_y = fluxes[0].fgeny;
+        _gen_z = fluxes[0].fgenz;
+        
+        _dk2gen = fluxes[0].fdk2gen;
+        _gen2vtx = fluxes[0].fgen2vtx;
+    }
+
+    
+    
+    
   auto const &generator_handle = evt.getValidHandle<std::vector<simb::MCTruth>>(_mctruthLabel);
   auto const &generator(*generator_handle);
   _n_true_nu = generator.size();

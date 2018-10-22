@@ -98,6 +98,15 @@ private:
   unsigned int _n_total_candidates;
   std::vector<double> _nu_candidate_vx, _nu_candidate_vy, _nu_candidate_vz;
 
+    double _dk_x;
+    double _dk_y;
+    double _dk_z;
+    double _gen_x;
+    double _gen_y;
+    double _gen_z;
+    double _dk2gen;
+    double _gen2vtx;
+    
   unsigned int _n_true_nu;
   int _nu_pdg;
   double _nu_E;
