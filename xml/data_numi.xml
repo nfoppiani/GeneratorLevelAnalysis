@@ -38,7 +38,7 @@
   <!-- Project stages -->
 
   <stage name="&name;">
-    <fcl>run_PandoraOnly_&name;.fcl</fcl>
+    <fcl>GeneratorLevelAnalysis_&name;.fcl</fcl>
     <inputdef>&dataset;</inputdef>
 
     <outdir>&scratch;/&user;/&folder_name;/&project_version;/&name;/out/</outdir>
@@ -46,7 +46,7 @@
     <workdir>&resilient;/&user;/&folder_name;/&project_version;/&name;/work/</workdir>
     <bookdir>&data;/&user;/&folder_name;/&project_version;/&name;/book/</bookdir>
 
-    <numjobs>50</numjobs>
+    <numjobs>100</numjobs>
     <disk>2GB</disk>
     <memory>2048</memory>
     <maxfilesperjob>30</maxfilesperjob>

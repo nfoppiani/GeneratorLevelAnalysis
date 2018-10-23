@@ -81,6 +81,8 @@ private:
 
   bool m_isOverlaidSample;
   bool m_isData;
+  double m_beamStart;
+  double m_beamEnd;
   std::string m_opticalFlashFinderLabel;
   std::string m_pfp_producer;
 
@@ -93,8 +95,9 @@ private:
 
   double _bnbweight;
 
-  std::vector<double> _flash_PE, _flash_time;
+  unsigned int _n_flash_simple, _n_flash_simple_over50, _n_flash_simple_beam, _n_flash_simple_over50_beam;
   std::vector<double> _flash_PE_simple, _flash_time_simple, _flash_y_simple, _flash_z_simple;
+  unsigned int _n_flash_op, _n_flash_op_over50, _n_flash_op_beam, _n_flash_op_over50_beam;
   std::vector<double> _flash_PE_op, _flash_time_op, _flash_y_op, _flash_z_op;
 
   unsigned int _n_total_candidates;

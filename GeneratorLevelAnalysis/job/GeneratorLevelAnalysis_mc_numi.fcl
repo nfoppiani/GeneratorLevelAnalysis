@@ -5,7 +5,9 @@ BEGIN_PROLOG
 loc_generatorLevelAnalyzer:
 {
     module_type:                "generatorLevelAnalyzer"
-    isData:                     true
+    isData: false
+    beamStart:  4.702
+    beamEnd:    14.502
 }
 
 END_PROLOG

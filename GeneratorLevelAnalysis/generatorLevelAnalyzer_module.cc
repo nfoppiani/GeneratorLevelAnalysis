@@ -20,10 +20,19 @@ generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
 
   myTTree = tfs->make<TTree>("tree", "Tree");
   myTTree->Branch("bnbweight", &_bnbweight, "bnbweight/D");
+  myTTree->Branch("n_flash_simple", &_n_flash_simple, "n_flash_simple/I");
+  myTTree->Branch("n_flash_simple_over50", &_n_flash_simple_over50, "n_flash_simple_over50/I");
+  myTTree->Branch("n_flash_simple_beam", &_n_flash_simple_beam, "n_flash_simple_beam/I");
+  myTTree->Branch("n_flash_simple_over50_beam", &_n_flash_simple_over50_beam, "n_flash_simple_over50_beam/I");
   myTTree->Branch("flash_time_simple", "std::vector< double >", &_flash_time_simple);
   myTTree->Branch("flash_PE_simple", "std::vector< double >", &_flash_PE_simple);
   myTTree->Branch("flash_y_simple", "std::vector< double >", &_flash_y_simple);
   myTTree->Branch("flash_z_simple", "std::vector< double >", &_flash_z_simple);
+
+  myTTree->Branch("n_flash_op", &_n_flash_op, "n_flash_op/I");
+  myTTree->Branch("n_flash_op_over50", &_n_flash_op_over50, "n_flash_op_over50/I");
+  myTTree->Branch("n_flash_op_beam", &_n_flash_op_beam, "n_flash_op_beam/I");
+  myTTree->Branch("n_flash_op_over50_beam", &_n_flash_op_over50_beam, "n_flash_op_over50_beam/I");
   myTTree->Branch("flash_time_op", "std::vector< double >", &_flash_time_op);
   myTTree->Branch("flash_PE_op", "std::vector< double >", &_flash_PE_op);
   myTTree->Branch("flash_y_op", "std::vector< double >", &_flash_y_op);
@@ -72,7 +81,9 @@ void generatorLevelAnalyzer::reconfigure(fhicl::ParameterSet const &p)
   m_opticalFlashFinderLabel = p.get<std::string>("OpticalFlashFinderLabel", "simpleFlashBeam");
   m_pfp_producer = p.get<std::string>("PFParticleProducer", "pandoraNu");
   m_isOverlaidSample = p.get<bool>("isOverlaidSample", false);
-  m_isData = p.get<bool>("isData", false);
+  m_isData = p.get<bool>("isData");
+  m_beamStart = p.get<double>("beamStart");
+  m_beamEnd = p.get<double>("beamEnd");
 }
 
 void generatorLevelAnalyzer::respondToOpenInputFile(art::FileBlock const &fb)
@@ -125,10 +136,19 @@ void generatorLevelAnalyzer::clear()
   _bnbweight = 1;
 
   //optical optical information
+  _n_flash_simple = 0;
+  _n_flash_simple_over50 = 0;
+  _n_flash_simple_beam = 0;
+  _n_flash_simple_over50_beam = 0;
   _flash_PE_simple.clear();
   _flash_time_simple.clear();
   _flash_y_simple.clear();
   _flash_z_simple.clear();
+
+  _n_flash_op = 0;
+  _n_flash_op_over50 = 0;
+  _n_flash_op_beam = 0;
+  _n_flash_op_over50_beam = 0;
   _flash_PE_op.clear();
   _flash_time_op.clear();
   _flash_y_op.clear();
@@ -223,6 +243,14 @@ void generatorLevelAnalyzer::opticalInformation(art::Event const &evt)
     _flash_time_simple.push_back(flash.Time());
     _flash_y_simple.push_back(flash.YCenter());
     _flash_z_simple.push_back(flash.ZCenter());
+
+    _n_flash_simple ++;
+    if (flash.TotalPE() > 50) _n_flash_simple_over50 ++;
+    if (flash.Time() > m_beamStart && flash.Time() < m_beamEnd)
+    {
+      _n_flash_simple_beam ++;
+      if (flash.TotalPE() > 50) _n_flash_simple_over50_beam ++;
+    }
   }
 
   art::InputTag optical_tag_op{"opflashBeam"};
@@ -235,6 +263,14 @@ void generatorLevelAnalyzer::opticalInformation(art::Event const &evt)
     _flash_time_op.push_back(flash.Time());
     _flash_y_op.push_back(flash.YCenter());
     _flash_z_op.push_back(flash.ZCenter());
+
+    _n_flash_op ++;
+    if (flash.TotalPE() > 50) _n_flash_op_over50 ++;
+    if (flash.Time() > m_beamStart && flash.Time() < m_beamEnd)
+    {
+      _n_flash_op_beam ++;
+      if (flash.TotalPE() > 50) _n_flash_op_over50_beam ++;
+    }
   }
 }
 
@@ -269,7 +305,6 @@ void generatorLevelAnalyzer::PNCandidatesInformation(art::Event const &evt)
 
 void generatorLevelAnalyzer::trueNeutrinoInformation(art::Event const &evt)
 {
-  std::cout << "true neutrino information function " << std::endl;
   auto const &generator_handle = evt.getValidHandle<std::vector<simb::MCTruth>>(_mctruthLabel);
   auto const &generator(*generator_handle);
   _n_true_nu = generator.size();
@@ -370,6 +405,7 @@ void generatorLevelAnalyzer::trueNeutrinoInformation(art::Event const &evt)
     }
   }
 }
+
 
 void generatorLevelAnalyzer::analyze(art::Event const &evt)
 {
