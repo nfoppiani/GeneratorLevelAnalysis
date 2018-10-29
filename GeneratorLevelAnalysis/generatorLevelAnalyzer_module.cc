@@ -25,16 +25,21 @@ generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
 
   myTTree->Branch("n_total_candidates", &_n_total_candidates, "n_total_candidates/i");
     
-    myTTree->Branch("dk_x", &_dk_x, "dk_x/D");
-    myTTree->Branch("dk_y", &_dk_y, "dk_y/D");
-    myTTree->Branch("dk_z", &_dk_z, "dk_z/D");
-    myTTree->Branch("gen_x", &_gen_x, "gen_x/D");
-    myTTree->Branch("gen_y", &_gen_y, "gen_y/D");
-    myTTree->Branch("gen_z", &_gen_z, "gen_z/D");
-    myTTree->Branch("dk2gen", &_dk2gen, "dk2gen/D");
-    myTTree->Branch("gen2vtx", &_gen2vtx, "gen2vtx/D");
-
-    
+  myTTree->Branch("dk_x", &_dk_x, "dk_x/D");
+  myTTree->Branch("dk_y", &_dk_y, "dk_y/D");
+  myTTree->Branch("dk_z", &_dk_z, "dk_z/D");
+  myTTree->Branch("dk_px", &_dk_px, "dk_px/D");
+  myTTree->Branch("dk_py", &_dk_py, "dk_py/D");
+  myTTree->Branch("dk_pz", &_dk_pz, "dk_pz/D");
+  myTTree->Branch("dk_pdg", &_dk_pdg, "dk_pdg/I");
+  myTTree->Branch("gen_x", &_gen_x, "gen_x/D");
+  myTTree->Branch("gen_y", &_gen_y, "gen_y/D");
+  myTTree->Branch("gen_z", &_gen_z, "gen_z/D");
+  myTTree->Branch("dk2gen", &_dk2gen, "dk2gen/D");
+  myTTree->Branch("gen2vtx", &_gen2vtx, "gen2vtx/D");
+  myTTree->Branch("totaltime", &_totaltime, "totaltime/D");
+  myTTree->Branch("delaytime", &_delaytime, "delaytime/D");
+  
   myTTree->Branch("nu_candidate_vx", "std::vector< double >", &_nu_candidate_vx);
   myTTree->Branch("nu_candidate_vy", "std::vector< double >", &_nu_candidate_vy);
   myTTree->Branch("nu_candidate_vz", "std::vector< double >", &_nu_candidate_vz);
@@ -137,6 +142,22 @@ void generatorLevelAnalyzer::clear()
   _nu_candidate_vy.clear();
   _nu_candidate_vz.clear();
 
+  //flux information
+  _dk_x = std::numeric_limits<double>::lowest();
+  _dk_y = std::numeric_limits<double>::lowest();
+  _dk_z = std::numeric_limits<double>::lowest();
+  _dk_px = std::numeric_limits<double>::lowest();
+  _dk_py = std::numeric_limits<double>::lowest();
+  _dk_pz = std::numeric_limits<double>::lowest();
+  _dk_pdg = std::numeric_limits<int>::lowest();
+  _gen_x = std::numeric_limits<double>::lowest();
+  _gen_y = std::numeric_limits<double>::lowest();
+  _gen_z = std::numeric_limits<double>::lowest();
+  _dk2gen = std::numeric_limits<double>::lowest();
+  _gen2vtx = std::numeric_limits<double>::lowest();
+  _totaltime = std::numeric_limits<double>::lowest();
+  _delaytime = std::numeric_limits<double>::lowest();
+  
   //true neutrino information
   _n_true_nu = std::numeric_limits<unsigned int>::lowest();
   _nu_pdg = std::numeric_limits<int>::lowest();
@@ -245,30 +266,75 @@ void generatorLevelAnalyzer::PNCandidatesInformation(art::Event const &evt)
   }
 }
 
+void generatorLevelAnalyzer::mcFluxInformation(art::Event const &evt)
+{
+  auto const &fluxes_handle = evt.getValidHandle<std::vector<simb::MCFlux>>(_mctruthLabel);
+  auto const &fluxes(*fluxes_handle);
+  
+  //Assume there's only one MCFlux in the fluxes vector
+  if(fluxes.size()>0){
+    
+    if(fluxes.size()>1) std::cout<<"WARNING: More than one MCFlux present"<<std::endl;
+    
+    _dk_x = fluxes[0].fvx;
+    _dk_y = fluxes[0].fvy;
+    _dk_z = fluxes[0].fvz;
+
+    _dk_px = fluxes[0].fpdpx;
+    _dk_py = fluxes[0].fpdpy;
+    _dk_pz = fluxes[0].fpdpz;
+    
+    _dk_pdg = fluxes[0].fptype;
+    
+    _gen_x = fluxes[0].fgenx;
+    _gen_y = fluxes[0].fgeny;
+    _gen_z = fluxes[0].fgenz;
+    
+    _dk2gen = fluxes[0].fdk2gen;
+    _gen2vtx = fluxes[0].fgen2vtx;
+  
+    
+    
+    //Calculate total propagation time
+    double const C_SPEED = 299792458;
+    double const UBDIST = sqrt(pow(54.499,2)+pow(74.461,2)+pow(677.611,2));
+    double parentMass = 0.;
+    double parentMomentum = 0;
+    double parentSpeed = 0.;
+
+    switch (abs(_dk_pdg)) {
+      case 130:
+        parentMass = 0.498; //K0L
+        break;
+      case 321:
+        parentMass = 0.494; //K+
+        break;
+      case 13:
+        parentMass = 0.106; //muon
+        break;
+      case 211:
+        parentMass = 0.140; //pi+
+        break;
+      default:
+        std::cout<<"WARNING: Neutrino parent not recognized"<<std::endl;
+        break;
+    }
+    
+    parentMomentum = sqrt(pow(_dk_px,2)+pow(_dk_py,2)+pow(_dk_pz,2));
+    if(parentMomentum > 0){
+      parentSpeed = C_SPEED*sqrt(pow(parentMomentum,2)/(pow(parentMass,2)+pow(parentMomentum,2)));
+
+      _totaltime  = (sqrt(pow(_dk_x,2)+pow(_dk_y,2)+pow(_dk_z,2))/100./parentSpeed + (_dk2gen + _gen2vtx)/C_SPEED)*pow(10,6);
+
+      _delaytime = _totaltime - UBDIST/C_SPEED*pow(10,6);
+
+      std::cout<<sqrt(pow(_dk_x,2)+pow(_dk_y,2)+pow(_dk_z,2))/100./parentSpeed<<" "<<parentSpeed<<" "<<parentSpeed/C_SPEED<<" "<<_delaytime<<" "<<_dk_px<<" "<<_dk_py<<" "<<_dk_pz<<" "<<std::endl;
+    }
+  }
+}
+
 void generatorLevelAnalyzer::trueNeutrinoInformation(art::Event const &evt)
 {
-    std::cout<<"***"<<std::endl;
-
-    auto const &fluxes_handle = evt.getValidHandle<std::vector<simb::MCFlux>>(_mctruthLabel);
-    auto const &fluxes(*fluxes_handle);
-    
-    //Assume there's only one MCFlux in the fluxes vector
-    if(fluxes.size()==1){
-        _dk_x = fluxes[0].fvx;
-        _dk_y = fluxes[0].fvy;
-        _dk_z = fluxes[0].fvz;
-        
-        _gen_x = fluxes[0].fgenx;
-        _gen_y = fluxes[0].fgeny;
-        _gen_z = fluxes[0].fgenz;
-        
-        _dk2gen = fluxes[0].fdk2gen;
-        _gen2vtx = fluxes[0].fgen2vtx;
-    }
-
-    
-    
-    
   auto const &generator_handle = evt.getValidHandle<std::vector<simb::MCTruth>>(_mctruthLabel);
   auto const &generator(*generator_handle);
   _n_true_nu = generator.size();
@@ -389,11 +455,10 @@ void generatorLevelAnalyzer::analyze(art::Event const &evt)
   // gen level information
   if (~is_data)
   {
+    mcFluxInformation(evt);
     trueNeutrinoInformation(evt);
   }
-    
-    endSubRun(evt.getSubRun());
-    
+        
   myTTree->Fill();
 }
 
