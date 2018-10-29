@@ -82,6 +82,8 @@ private:
 
   bool m_isOverlaidSample;
   bool m_isData;
+  double m_beamStart;
+  double m_beamEnd;
   std::string m_opticalFlashFinderLabel;
   std::string m_pfp_producer;
 
@@ -94,10 +96,14 @@ private:
 
   double _bnbweight;
 
-  std::vector<double> _flash_PE, _flash_time;
+  unsigned int _n_flash_simple, _n_flash_simple_over50, _n_flash_simple_beam, _n_flash_simple_over50_beam;
+  std::vector<double> _flash_PE_simple, _flash_time_simple, _flash_y_simple, _flash_z_simple;
+  unsigned int _n_flash_op, _n_flash_op_over50, _n_flash_op_beam, _n_flash_op_over50_beam;
+  std::vector<double> _flash_PE_op, _flash_time_op, _flash_y_op, _flash_z_op;
 
   unsigned int _n_total_candidates;
   std::vector<double> _nu_candidate_vx, _nu_candidate_vy, _nu_candidate_vz;
+  std::vector<int> _n_daughters_candidate;
 
   double _dk_x; //x-position of decay point [cm]
   double _dk_y; //y-position of decay point [cm]
@@ -138,6 +144,7 @@ private:
   std::vector < std::vector<double> > _nu_daughters_p;
   std::vector < std::vector<double> > _nu_daughters_start_v;
   std::vector < std::vector<double> > _nu_daughters_end_v;
+  unsigned int _n_true_daughter_candidates;
   double _true_daughter_E;
   double _true_daughter_theta;
   double _true_daughter_phi;
