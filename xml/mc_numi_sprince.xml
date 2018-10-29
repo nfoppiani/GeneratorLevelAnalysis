@@ -38,7 +38,7 @@
   <!-- Project stages -->
 
   <stage name="&name;">
-    <fcl>GeneratorLevelAnalysis.fcl</fcl>
+    <fcl>GeneratorLevelAnalysis_mc_numi.fcl</fcl>
     <inputdef>&dataset;</inputdef>
 
     <outdir>&scratch;/&user;/&folder_name;/&project_version;/&name;/out/</outdir>
