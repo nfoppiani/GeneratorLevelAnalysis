@@ -394,10 +394,7 @@ void generatorLevelAnalyzer::mcFluxInformation(art::Event const &evt)
       parentSpeed = C_SPEED*sqrt(pow(parentMomentum,2)/(pow(parentMass,2)+pow(parentMomentum,2)));
 
       _totaltime  = (sqrt(pow(_dk_x,2)+pow(_dk_y,2)+pow(_dk_z,2))/100./parentSpeed + (_dk2gen + _gen2vtx)/C_SPEED)*pow(10,6);
-
       _delaytime = _totaltime - UBDIST/C_SPEED*pow(10,6);
-
-      std::cout<<sqrt(pow(_dk_x,2)+pow(_dk_y,2)+pow(_dk_z,2))/100./parentSpeed<<" "<<parentSpeed<<" "<<parentSpeed/C_SPEED<<" "<<_delaytime<<" "<<_dk_px<<" "<<_dk_py<<" "<<_dk_pz<<" "<<std::endl;
     }
   }
 }
