@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE project [
+<!ENTITY name "mc_numi_timing">
+<!ENTITY project_version "v1">
+<!ENTITY release "v06_26_01_17">
+<!ENTITY qualifier "e10:prof">
+<!ENTITY user "sprince">
+<!ENTITY dataset "prodgenie_numi_cosmic_uboone_mcc8.8_detsim_mec_reco2">
+<!ENTITY resilient "/pnfs/uboone/resilient/users">
+<!ENTITY scratch "/pnfs/uboone/scratch/users">
+<!ENTITY data "/uboone/data/users">
+<!ENTITY folder_name "numi_timing">
+]>
+
+
+<project name="&name;">
+
+  <!-- Group -->
+  <group>uboone</group>
+
+  <!-- Operating System -->
+  <os>SL6</os>
+
+  <!--  Project size  -->
+  <numevents>1000000</numevents>
+
+  <!-- Batch resources -->
+  <resource>DEDICATED,OPPORTUNISTIC,OFFSITE</resource>
+
+
+  <!-- Larsoft information -->
+  <larsoft>
+    <tag>&release;</tag>
+    <qual>&qualifier;</qual>
+    <local>&resilient;/&user;/timing.tar</local>
+  </larsoft>
+
+  <!-- Project stages -->
+
+  <stage name="&name;">
+    <fcl>GeneratorLevelAnalysis_mc_numi.fcl</fcl>
+    <inputdef>&dataset;</inputdef>
+
+    <outdir>&scratch;/&user;/&folder_name;/&project_version;/&name;/out/</outdir>
+    <logdir>&scratch;/&user;/&folder_name;/&project_version;/&name;/log/</logdir>
+    <workdir>&resilient;/&user;/&folder_name;/&project_version;/&name;/work/</workdir>
+    <bookdir>&data;/&user;/&folder_name;/&project_version;/&name;/book/</bookdir>
+
+    <numjobs>20</numjobs>
+    <disk>2GB</disk>
+    <memory>2048</memory>
+    <maxfilesperjob>50</maxfilesperjob>
+    <schema>root</schema>
+    <jobsub>--expected-lifetime=6h -q --generate-email-summary --append_condor_requirements='(TARGET.HAS_CVMFS_uboone_opensciencegrid_org==true)'</jobsub>
+    <jobsub_start>--append_condor_requirements='(TARGET.HAS_CVMFS_uboone_opensciencegrid_org==true)'</jobsub_start>
+  </stage>
+
+</project>
