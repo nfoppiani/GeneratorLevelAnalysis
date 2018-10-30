@@ -178,16 +178,16 @@ void generatorLevelAnalyzer::clear()
   _n_daughters_candidate.clear();
 
   //flux information
-  _dk_x = -1;
-  _dk_y = -1;
-  _dk_z = -1;
-  _dk_px = -1;
-  _dk_py = -1;
-  _dk_pz = -1;
-  _dk_pdg = -1;
-  _gen_x = -1;
-  _gen_y = -1;
-  _gen_z = -1;
+  _dk_x = std::numeric_limits<double>::lowest();
+  _dk_y = std::numeric_limits<double>::lowest();
+  _dk_z = std::numeric_limits<double>::lowest();
+  _dk_px = std::numeric_limits<double>::lowest();
+  _dk_py = std::numeric_limits<double>::lowest();
+  _dk_pz = std::numeric_limits<double>::lowest();
+  _dk_pdg = std::numeric_limits<int>::lowest();
+  _gen_x = std::numeric_limits<double>::lowest();
+  _gen_y = std::numeric_limits<double>::lowest();
+  _gen_z = std::numeric_limits<double>::lowest();
   _dk2gen = -1;
   _gen2vtx = -1;
   _totaltime = -1;
