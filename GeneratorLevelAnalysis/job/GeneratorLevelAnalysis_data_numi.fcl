@@ -1,7 +1,5 @@
 #include "services_microboone.fcl"
 
-BEGIN_PROLOG
-
 loc_generatorLevelAnalyzer:
 {
     module_type:                "generatorLevelAnalyzer"
@@ -10,10 +8,8 @@ loc_generatorLevelAnalyzer:
     beamEnd:    15.502
 }
 
-END_PROLOG
 
-
-process_name: generatorLevelAnalyzer      #The process name must NOT contain any underscores
+#process_name: generatorLevelAnalyzer      #The process name must NOT contain any underscores
 
 source:
 {

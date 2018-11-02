@@ -19,7 +19,6 @@ generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
   myPOTTTree->Branch("subrun", &_subrun_sr, "subrun/i");
 
   myTTree = tfs->make<TTree>("tree", "Tree");
-  myTTree->Branch("bnbweight", &_bnbweight, "bnbweight/D");
   myTTree->Branch("n_flash_simple", &_n_flash_simple, "n_flash_simple/I");
   myTTree->Branch("n_flash_simple_over50", &_n_flash_simple_over50, "n_flash_simple_over50/I");
   myTTree->Branch("n_flash_simple_beam", &_n_flash_simple_beam, "n_flash_simple_beam/I");
@@ -39,7 +38,14 @@ generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
   myTTree->Branch("flash_z_op", "std::vector< double >", &_flash_z_op);
 
   myTTree->Branch("n_total_candidates", &_n_total_candidates, "n_total_candidates/i");
-    
+  myTTree->Branch("nu_candidate_vx", "std::vector< double >", &_nu_candidate_vx);
+  myTTree->Branch("nu_candidate_vy", "std::vector< double >", &_nu_candidate_vy);
+  myTTree->Branch("nu_candidate_vz", "std::vector< double >", &_nu_candidate_vz);
+  myTTree->Branch("n_daughters_candidate", "std::vector< int >", &_n_daughters_candidate);
+
+  myTTree->Branch("bnbweight", &_bnbweight, "bnbweight/D");
+
+  myTTree->Branch("n_mcfluxes", &_n_mcfluxes, "n_mcfluxes/I");
   myTTree->Branch("dk_x", &_dk_x, "dk_x/D");
   myTTree->Branch("dk_y", &_dk_y, "dk_y/D");
   myTTree->Branch("dk_z", &_dk_z, "dk_z/D");
@@ -54,11 +60,6 @@ generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
   myTTree->Branch("gen2vtx", &_gen2vtx, "gen2vtx/D");
   myTTree->Branch("totaltime", &_totaltime, "totaltime/D");
   myTTree->Branch("delaytime", &_delaytime, "delaytime/D");
-  
-  myTTree->Branch("nu_candidate_vx", "std::vector< double >", &_nu_candidate_vx);
-  myTTree->Branch("nu_candidate_vy", "std::vector< double >", &_nu_candidate_vy);
-  myTTree->Branch("nu_candidate_vz", "std::vector< double >", &_nu_candidate_vz);
-  myTTree->Branch("n_daughters_candidate", "std::vector< int >", &_n_daughters_candidate);
 
   myTTree->Branch("n_true_nu", &_n_true_nu, "n_true_nu/i");
   myTTree->Branch("nu_pdg", &_nu_pdg, "nu_pdg/I");
@@ -104,7 +105,7 @@ void generatorLevelAnalyzer::reconfigure(fhicl::ParameterSet const &p)
 
 void generatorLevelAnalyzer::respondToOpenInputFile(art::FileBlock const &fb)
 {
-    _sum_pot = 0;
+  _sum_pot = 0;
 }
 
 void generatorLevelAnalyzer::endSubRun(art::SubRun const &sr)
@@ -178,6 +179,7 @@ void generatorLevelAnalyzer::clear()
   _n_daughters_candidate.clear();
 
   //flux information
+  _n_mcfluxes = -1;
   _dk_x = std::numeric_limits<double>::lowest();
   _dk_y = std::numeric_limits<double>::lowest();
   _dk_z = std::numeric_limits<double>::lowest();
@@ -192,7 +194,7 @@ void generatorLevelAnalyzer::clear()
   _gen2vtx = -1;
   _totaltime = -1;
   _delaytime = -1;
-  
+
   //true neutrino information
   _n_true_nu = std::numeric_limits<unsigned int>::lowest();
   _nu_pdg = std::numeric_limits<int>::lowest();
@@ -224,43 +226,6 @@ void generatorLevelAnalyzer::clear()
   _true_daughter_phi = std::numeric_limits<double>::lowest();
   _true_daughter_T = std::numeric_limits<double>::lowest();
 
-}
-
-void generatorLevelAnalyzer::storeBNBWeight(art::Event const &evt)
-{
-  if (!evt.isRealData() || m_isOverlaidSample)
-  {
-    // nu_e flux must be corrected by event weight
-    art::InputTag eventweight_tag("eventweight");
-    auto const &eventweights_handle =
-        evt.getValidHandle<std::vector<evwgh::MCEventWeight>>(eventweight_tag);
-    if (!eventweights_handle.isValid())
-    {
-      _bnbweight = 1;
-    }
-    else
-    {
-      auto const &eventweights(*eventweights_handle);
-      if (eventweights.size() > 0)
-      {
-        for (auto last : eventweights.at(0).fWeight)
-        {
-          if (last.first.find("bnbcorrection") != std::string::npos && std::isfinite(last.second.at(0)))
-          {
-            _bnbweight = last.second.at(0);
-          }
-          else
-          {
-            _bnbweight = 1;
-          }
-        }
-      }
-      else
-      {
-        _bnbweight = 1;
-      }
-    }
-  }
 }
 
 void generatorLevelAnalyzer::opticalInformation(art::Event const &evt)
@@ -335,35 +300,73 @@ void generatorLevelAnalyzer::PNCandidatesInformation(art::Event const &evt)
   }
 }
 
+void generatorLevelAnalyzer::storeBNBWeight(art::Event const &evt)
+{
+  if (!evt.isRealData() || m_isOverlaidSample)
+  {
+    // nu_e flux must be corrected by event weight
+    art::InputTag eventweight_tag("eventweight");
+    auto const &eventweights_handle =
+        evt.getValidHandle<std::vector<evwgh::MCEventWeight>>(eventweight_tag);
+    if (!eventweights_handle.isValid())
+    {
+      _bnbweight = 1;
+    }
+    else
+    {
+      auto const &eventweights(*eventweights_handle);
+      if (eventweights.size() > 0)
+      {
+        for (auto last : eventweights.at(0).fWeight)
+        {
+          if (last.first.find("bnbcorrection") != std::string::npos && std::isfinite(last.second.at(0)))
+          {
+            _bnbweight = last.second.at(0);
+          }
+          else
+          {
+            _bnbweight = 1;
+          }
+        }
+      }
+      else
+      {
+        _bnbweight = 1;
+      }
+    }
+  }
+}
+
 void generatorLevelAnalyzer::mcFluxInformation(art::Event const &evt)
 {
   auto const &fluxes_handle = evt.getValidHandle<std::vector<simb::MCFlux>>(_mctruthLabel);
   auto const &fluxes(*fluxes_handle);
-  
-  //Assume there's only one MCFlux in the fluxes vector
-  if(fluxes.size()>0){
-    
-    if(fluxes.size()>1) std::cout<<"WARNING: More than one MCFlux present"<<std::endl;
-    
-    _dk_x = fluxes[0].fvx;
-    _dk_y = fluxes[0].fvy;
-    _dk_z = fluxes[0].fvz;
 
-    _dk_px = fluxes[0].fpdpx;
-    _dk_py = fluxes[0].fpdpy;
-    _dk_pz = fluxes[0].fpdpz;
-    
-    _dk_pdg = fluxes[0].fptype;
-    
-    _gen_x = fluxes[0].fgenx;
-    _gen_y = fluxes[0].fgeny;
-    _gen_z = fluxes[0].fgenz;
-    
-    _dk2gen = fluxes[0].fdk2gen;
-    _gen2vtx = fluxes[0].fgen2vtx;
-  
-    
-    
+  //Assume there's only one MCFlux in the fluxes vector
+  _n_mcfluxes = fluxes.size();
+  if(_n_mcfluxes > 0)
+  {
+
+    if(_n_mcfluxes > 1) std::cout<<"WARNING: More than one MCFlux present"<<std::endl;
+
+    auto flux = fluxes[0];
+    _dk_x = flux.fvx;
+    _dk_y = flux.fvy;
+    _dk_z = flux.fvz;
+
+    _dk_px = flux.fpdpx;
+    _dk_py = flux.fpdpy;
+    _dk_pz = flux.fpdpz;
+
+    _dk_pdg = flux.fptype;
+
+    _gen_x = flux.fgenx;
+    _gen_y = flux.fgeny;
+    _gen_z = flux.fgenz;
+
+    _dk2gen = flux.fdk2gen;
+    _gen2vtx = flux.fgen2vtx;
+
     //Calculate total propagation time
     double const C_SPEED = 299792458;
     double const UBDIST = sqrt(pow(54.499,2)+pow(74.461,2)+pow(677.611,2));
@@ -388,9 +391,10 @@ void generatorLevelAnalyzer::mcFluxInformation(art::Event const &evt)
         std::cout<<"WARNING: Neutrino parent not recognized"<<std::endl;
         break;
     }
-    
+
     parentMomentum = sqrt(pow(_dk_px,2)+pow(_dk_py,2)+pow(_dk_pz,2));
-    if(parentMomentum > 0){
+    if(parentMomentum > 0)
+    {
       parentSpeed = C_SPEED*sqrt(pow(parentMomentum,2)/(pow(parentMass,2)+pow(parentMomentum,2)));
 
       _totaltime  = (sqrt(pow(_dk_x,2)+pow(_dk_y,2)+pow(_dk_z,2))/100./parentSpeed + (_dk2gen + _gen2vtx)/C_SPEED)*pow(10,6);

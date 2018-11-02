@@ -105,6 +105,7 @@ private:
   std::vector<double> _nu_candidate_vx, _nu_candidate_vy, _nu_candidate_vz;
   std::vector<int> _n_daughters_candidate;
 
+  int _n_mcfluxes; //number of MC Fluxes in the handle
   double _dk_x; //x-position of decay point [cm]
   double _dk_y; //y-position of decay point [cm]
   double _dk_z; //z-position of decay point [cm]
@@ -119,7 +120,7 @@ private:
   double _gen2vtx; //distance between origin of ray from flux generator and neutrino interaction point [m]
   double _totaltime; //total time between target and neutrino interaction [microseconds]
   double _delaytime; //difference between total time and time of prompt neutrino, i.e. travelling at light speed from the target to MicroBooNE's position [microseconds]
-  
+
   unsigned int _n_true_nu;
   int _nu_pdg;
   double _nu_E;
