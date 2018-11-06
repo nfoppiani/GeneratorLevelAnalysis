@@ -19,6 +19,10 @@ generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
   myPOTTTree->Branch("subrun", &_subrun_sr, "subrun/i");
 
   myTTree = tfs->make<TTree>("tree", "Tree");
+  myTTree->Branch("event", &_event, "event/i");
+  myTTree->Branch("run", &_run, "run/i");
+  myTTree->Branch("subrun", &_subrun, "subrun/i");
+
   myTTree->Branch("n_flash_simple", &_n_flash_simple, "n_flash_simple/I");
   myTTree->Branch("n_flash_simple_over50", &_n_flash_simple_over50, "n_flash_simple_over50/I");
   myTTree->Branch("n_flash_simple_beam", &_n_flash_simple_beam, "n_flash_simple_beam/I");
@@ -510,8 +514,14 @@ void generatorLevelAnalyzer::trueNeutrinoInformation(art::Event const &evt)
 void generatorLevelAnalyzer::analyze(art::Event const &evt)
 {
   clear();
-  std::cout << "RUN " << evt.run() << " SUBRUN " << evt.subRun() << " EVENT " << evt.id().event()
+  std::cout << "[GENERATOR LEVEL ANALYZER] : RUN " << evt.run()
+            << " SUBRUN " << evt.subRun()
+            << " EVENT " << evt.id().event()
             << std::endl;
+
+  _event = evt.event();
+  _run = evt.run();
+  _subrun = evt.subRun();
 
   // optical information
   opticalInformation(evt);

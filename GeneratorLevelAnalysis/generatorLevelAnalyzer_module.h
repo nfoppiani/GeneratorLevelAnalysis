@@ -94,6 +94,7 @@ private:
 
   TTree *myTTree;
 
+  unsigned int _run, _subrun, _event;
   double _bnbweight;
 
   unsigned int _n_flash_simple, _n_flash_simple_over50, _n_flash_simple_beam, _n_flash_simple_over50_beam;
