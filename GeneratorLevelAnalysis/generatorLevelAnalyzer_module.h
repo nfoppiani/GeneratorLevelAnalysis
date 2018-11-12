@@ -137,6 +137,17 @@ private:
   double _true_vz;
   unsigned int _interaction_type;
 
+  std::vector<int> _nu_pdg_v;
+  std::vector<double> _nu_E_v;
+  std::vector<double> _nu_theta_v;
+  std::vector<double> _nu_phi_v;
+  std::vector<double> _nu_T_v;
+  std::vector<int> _ccnc_v;
+  std::vector<double> _true_vx_v;
+  std::vector<double> _true_vy_v;
+  std::vector<double> _true_vz_v;
+  std::vector<int> _interaction_type_v;
+
   std::vector<double> _nu_daughters_E;
   std::vector<int> _nu_daughters_pdg;
   unsigned int _n_true_pions;

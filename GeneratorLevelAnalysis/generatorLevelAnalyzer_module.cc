@@ -80,6 +80,17 @@ generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
   myTTree->Branch("true_vz", &_true_vz, "true_vz/D");
   myTTree->Branch("interaction_type", &_interaction_type, "interaction_type/i");
 
+  myTTree->Branch("nu_pdg_v", "std::vector< int >", &_nu_pdg_v);
+  myTTree->Branch("nu_E_v", "std::vector< double >", &_nu_E_v);
+  myTTree->Branch("nu_theta_v", "std::vector< double >", &_nu_theta_v);
+  myTTree->Branch("nu_ph_vi", "std::vector< double >", &_nu_phi_v);
+  myTTree->Branch("nu_T_v", "std::vector< double >", &_nu_T_v);
+  myTTree->Branch("ccnc_v", "std::vector< int >", &_ccnc_v);
+  myTTree->Branch("true_vx_v", "std::vector< double >", &_true_vx_v);
+  myTTree->Branch("true_vy_v", "std::vector< double >", &_true_vy_v);
+  myTTree->Branch("true_vz_v", "std::vector< double >", &_true_vz_v);
+  myTTree->Branch("interaction_type_v", "std::vector< int >", &_interaction_type_v);
+
   myTTree->Branch("nu_daughters_E", "std::vector< double >", &_nu_daughters_E);
   myTTree->Branch("nu_daughters_pdg", "std::vector< int >", &_nu_daughters_pdg);
   myTTree->Branch("n_true_pions", &_n_true_pions, "n_true_pions/i");
@@ -214,6 +225,17 @@ void generatorLevelAnalyzer::clear()
   _true_vy = std::numeric_limits<double>::lowest();
   _true_vz = std::numeric_limits<double>::lowest();
   _interaction_type = std::numeric_limits<int>::lowest();
+
+  _nu_pdg_v.clear();
+  _nu_E_v.clear();
+  _nu_theta_v.clear();
+  _nu_phi_v.clear();
+  _nu_T_v.clear();
+  _ccnc_v.clear();
+  _true_vx_v.clear();
+  _true_vy_v.clear();
+  _true_vz_v.clear();
+  _interaction_type_v.clear();
 
   _nu_daughters_E.clear();
   _nu_daughters_pdg.clear();
@@ -437,6 +459,26 @@ void generatorLevelAnalyzer::trueNeutrinoInformation(art::Event const &evt)
 
       break; // In case of events with more than one neutrino (2% of the total) we take for the moment only the first one
       // It should probably be fixed to get the neutrino in the active volume, and see how many events have two neutrinos in the TPC volume
+    }
+  }
+
+  for (auto &gen : generator)
+  {
+    if (gen.Origin() == simb::kBeamNeutrino)
+    {
+      _nu_pdg_v.push_back(gen.GetNeutrino().Nu().PdgCode());
+      _nu_E_v.push_back(gen.GetNeutrino().Nu().E());
+      _nu_theta_v.push_back(gen.GetNeutrino().Nu().Momentum().Theta());
+      _nu_phi_v.push_back(gen.GetNeutrino().Nu().Momentum().Phi());
+      _nu_T_v.push_back(gen.GetNeutrino().Nu().T());
+
+      _ccnc_v.push_back(gen.GetNeutrino().CCNC());
+
+      _true_vx_v.push_back(gen.GetNeutrino().Nu().Vx());
+      _true_vy_v.push_back(gen.GetNeutrino().Nu().Vy());
+      _true_vz_v.push_back(gen.GetNeutrino().Nu().Vz());
+
+      _interaction_type_v.push_back(gen.GetNeutrino().Mode());
     }
   }
 
