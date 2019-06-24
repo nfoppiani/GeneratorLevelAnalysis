@@ -39,10 +39,6 @@
 #include "lardataobj/RecoBase/Vertex.h"
 #include "lardataobj/RecoBase/OpFlash.h"
 
-#include "uboone/EventWeight/MCEventWeight.h"
-
-#include "PandoraInterfaceHelper.h"
-
 class generatorLevelAnalyzer;
 
 class generatorLevelAnalyzer : public art::EDAnalyzer
@@ -78,8 +74,6 @@ private:
   std::string _mctruthLabel = "generator";
   std::string _mcparticleLabel = "largeant";
 
-  lee::PandoraInterfaceHelper pandoraHelper;
-
   bool m_isOverlaidSample;
   bool m_isData;
   double m_beamStart;
@@ -101,67 +95,6 @@ private:
   std::vector<double> _flash_PE_simple, _flash_time_simple, _flash_y_simple, _flash_z_simple;
   unsigned int _n_flash_op, _n_flash_op_over50, _n_flash_op_beam, _n_flash_op_over50_beam;
   std::vector<double> _flash_PE_op, _flash_time_op, _flash_y_op, _flash_z_op;
-
-  unsigned int _n_total_candidates;
-  std::vector<double> _nu_candidate_vx, _nu_candidate_vy, _nu_candidate_vz;
-  std::vector<int> _n_daughters_candidate;
-
-  int _n_mcfluxes; //number of MC Fluxes in the handle
-  double _dk_x; //x-position of decay point [cm]
-  double _dk_y; //y-position of decay point [cm]
-  double _dk_z; //z-position of decay point [cm]
-  double _dk_px; //neutrino parent x-momentum at decay point [GeV]
-  double _dk_py; //neutrino parent y-momentum at decay point [GeV]
-  double _dk_pz; //neutrino parent z-momentum at decay point [GeV]
-  int _dk_pdg; //neutrino parent PDG ID
-  double _gen_x; //x-position of origin of ray from flux generator [m]
-  double _gen_y; //y-position of origin of ray from flux generator [m]
-  double _gen_z; //z-position of origin of ray from flux generator [m]
-  double _dk2gen; //distance between decay point and origin of ray from flux generator [m]
-  double _gen2vtx; //distance between origin of ray from flux generator and neutrino interaction point [m]
-  double _totaltime; //total time between target and neutrino interaction [microseconds]
-  double _delaytime; //difference between total time and time of prompt neutrino, i.e. travelling at light speed from the target to MicroBooNE's position [microseconds]
-
-  unsigned int _n_true_nu;
-  int _nu_pdg;
-  double _nu_E;
-  double _nu_theta;
-  double _nu_phi;
-  double _nu_T;
-  double _nu_pt;
-  double _nu_qsqr;
-  double _nu_w;
-  int _ccnc;
-  double _true_vx;
-  double _true_vy;
-  double _true_vz;
-  unsigned int _interaction_type;
-
-  std::vector<int> _nu_pdg_v;
-  std::vector<double> _nu_E_v;
-  std::vector<double> _nu_theta_v;
-  std::vector<double> _nu_phi_v;
-  std::vector<double> _nu_T_v;
-  std::vector<int> _ccnc_v;
-  std::vector<double> _true_vx_v;
-  std::vector<double> _true_vy_v;
-  std::vector<double> _true_vz_v;
-  std::vector<int> _interaction_type_v;
-
-  std::vector<double> _nu_daughters_E;
-  std::vector<int> _nu_daughters_pdg;
-  unsigned int _n_true_pions;
-  unsigned int _n_true_protons;
-  unsigned int _n_true_protons_above40;
-  unsigned int _n_true_protons_above21;
-  std::vector < std::vector<double> > _nu_daughters_p;
-  std::vector < std::vector<double> > _nu_daughters_start_v;
-  std::vector < std::vector<double> > _nu_daughters_end_v;
-  unsigned int _n_true_daughter_candidates;
-  double _true_daughter_E;
-  double _true_daughter_theta;
-  double _true_daughter_phi;
-  double _true_daughter_T;
 
   std::map<int, int> _pdg_daughter = {{12, 11}, {14, 13}, {-12, -11}, {-14, -13}};
 };
