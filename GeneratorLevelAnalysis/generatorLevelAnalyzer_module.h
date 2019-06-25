@@ -23,20 +23,13 @@
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "larcoreobj/SummaryData/POTSummary.h"
 #include "TTree.h"
-#include "nusimdata/SimulationBase/MCParticle.h"
-#include "nusimdata/SimulationBase/MCTruth.h"
-#include "nusimdata/SimulationBase/MCFlux.h"
-
-#include "larevt/SpaceChargeServices/SpaceChargeService.h"
-#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
-#include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "lardata/DetectorInfo/DetectorProperties.h"
+// #include "nusimdata/SimulationBase/MCParticle.h"
+// #include "nusimdata/SimulationBase/MCTruth.h"
+// #include "nusimdata/SimulationBase/MCFlux.h"
 
 #include "canvas/Persistency/Common/FindOneP.h"
 #include "canvas/Persistency/Common/FindManyP.h"
 
-#include "lardataobj/RecoBase/PFParticle.h"
-#include "lardataobj/RecoBase/Vertex.h"
 #include "lardataobj/RecoBase/OpFlash.h"
 
 class generatorLevelAnalyzer;
@@ -58,7 +51,7 @@ public:
   void analyze(art::Event const &evt) override;
 
   // Selected optional functions.
-  void reconfigure(fhicl::ParameterSet const &p) override;
+  void reconfigure(fhicl::ParameterSet const &p);
   void respondToOpenInputFile(art::FileBlock const &fb) override;
   void endSubRun(art::SubRun const &sr) override;
   void clear();
@@ -93,8 +86,8 @@ private:
 
   unsigned int _n_flash_simple, _n_flash_simple_over50, _n_flash_simple_beam, _n_flash_simple_over50_beam;
   std::vector<double> _flash_PE_simple, _flash_time_simple, _flash_y_simple, _flash_z_simple;
-  unsigned int _n_flash_op, _n_flash_op_over50, _n_flash_op_beam, _n_flash_op_over50_beam;
-  std::vector<double> _flash_PE_op, _flash_time_op, _flash_y_op, _flash_z_op;
+  // unsigned int _n_flash_op, _n_flash_op_over50, _n_flash_op_beam, _n_flash_op_over50_beam;
+  // std::vector<double> _flash_PE_op, _flash_time_op, _flash_y_op, _flash_z_op;
 
   std::map<int, int> _pdg_daughter = {{12, 11}, {14, 13}, {-12, -11}, {-14, -13}};
 };

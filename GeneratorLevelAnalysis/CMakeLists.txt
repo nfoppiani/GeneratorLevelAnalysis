@@ -9,15 +9,12 @@ art_make(
                         lardataobj_RecoBase
                         nusimdata_SimulationBase
                         lardataobj_MCBase
-			lardataobj_Simulation
+                        lardataobj_Simulation
                         larcore_Geometry
                         larcore_Geometry_Geometry_service
                         art_Framework_Core
                         art_Framework_Services_Registry
                         art_Framework_Principal
-			art_Persistency_Common canvas_Persistency_Common
-			art_Persistency_Provenance canvas_Persistency_Provenance
-			art_Utilities canvas_Utilities
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_IO_SOURCES}
                         ${ART_FRAMEWORK_PRINCIPAL}
@@ -37,24 +34,17 @@ art_make(
                         ${ROOT_GDML}
                         ${ROOT_BASIC_LIB_LIST}
                         ${SIMULATIONBASE}
-                        larsim_MCCheater_BackTracker_service
 
           MODULE_LIBRARIES
                         larpandora_LArPandoraInterface
-			larsim_MCCheater_BackTracker_service
                         lardataobj_RecoBase
                         nusimdata_SimulationBase
                         lardataobj_MCBase
-			lardataobj_Simulation
-                        larcore_Geometry
-                        larcore_Geometry_Geometry_service
+                        lardataobj_Simulation
                         art_Framework_Core
                         art_Framework_Services_Registry
                         art_Framework_Principal
-                        art_Persistency_Common canvas_Persistency_Common
-			art_Persistency_Provenance canvas_Persistency_Provenance
-			art_Utilities canvas_Utilities
-			${ART_FRAMEWORK_CORE}
+                        ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_IO_SOURCES}
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -73,8 +63,9 @@ art_make(
                         ${ROOT_GDML}
                         ${ROOT_BASIC_LIB_LIST}
                         ${SIMULATIONBASE}
-                        GeneratorLevelAnalysis
 )
+
+cet_enable_asserts()
 
 add_subdirectory(job)
 

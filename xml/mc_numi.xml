@@ -2,14 +2,14 @@
 <!DOCTYPE project [
 <!ENTITY name "mc_numi">
 <!ENTITY project_version "v1">
-<!ENTITY release "v06_26_01_17">
-<!ENTITY qualifier "e10:prof">
+<!ENTITY release "v08_00_00_13">
+<!ENTITY qualifier "e17:prof">
 <!ENTITY user "foppiani">
 <!ENTITY file_list "/uboone/data/users/kmistry/book/MCC9/prodgenie_numi_uboone_overlay_fhc_mcc9/reco2/files.list">
 <!ENTITY resilient "/pnfs/uboone/resilient/users">
 <!ENTITY scratch "/pnfs/uboone/scratch/users">
 <!ENTITY data "/uboone/data/users">
-<!ENTITY folder_name "numi_gen_level">
+<!ENTITY folder_name "numi_flash_mcc9">
 ]>
 
 
@@ -32,7 +32,7 @@
   <larsoft>
     <tag>&release;</tag>
     <qual>&qualifier;</qual>
-    <local>&resilient;/&user;/&folder_name;/&project_version;/gen_level.tar</local>
+    <local>&resilient;/&user;/&folder_name;/&project_version;/local.tar</local>
   </larsoft>
 
   <!-- Project stages -->
