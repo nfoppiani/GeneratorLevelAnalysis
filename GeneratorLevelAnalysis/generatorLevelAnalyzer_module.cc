@@ -32,14 +32,14 @@ generatorLevelAnalyzer::generatorLevelAnalyzer(fhicl::ParameterSet const &p)
   myTTree->Branch("flash_y_simple", "std::vector< double >", &_flash_y_simple);
   myTTree->Branch("flash_z_simple", "std::vector< double >", &_flash_z_simple);
 
-  myTTree->Branch("n_flash_op", &_n_flash_op, "n_flash_op/I");
-  myTTree->Branch("n_flash_op_over50", &_n_flash_op_over50, "n_flash_op_over50/I");
-  myTTree->Branch("n_flash_op_beam", &_n_flash_op_beam, "n_flash_op_beam/I");
-  myTTree->Branch("n_flash_op_over50_beam", &_n_flash_op_over50_beam, "n_flash_op_over50_beam/I");
-  myTTree->Branch("flash_time_op", "std::vector< double >", &_flash_time_op);
-  myTTree->Branch("flash_PE_op", "std::vector< double >", &_flash_PE_op);
-  myTTree->Branch("flash_y_op", "std::vector< double >", &_flash_y_op);
-  myTTree->Branch("flash_z_op", "std::vector< double >", &_flash_z_op);
+  // myTTree->Branch("n_flash_op", &_n_flash_op, "n_flash_op/I");
+  // myTTree->Branch("n_flash_op_over50", &_n_flash_op_over50, "n_flash_op_over50/I");
+  // myTTree->Branch("n_flash_op_beam", &_n_flash_op_beam, "n_flash_op_beam/I");
+  // myTTree->Branch("n_flash_op_over50_beam", &_n_flash_op_over50_beam, "n_flash_op_over50_beam/I");
+  // myTTree->Branch("flash_time_op", "std::vector< double >", &_flash_time_op);
+  // myTTree->Branch("flash_PE_op", "std::vector< double >", &_flash_PE_op);
+  // myTTree->Branch("flash_y_op", "std::vector< double >", &_flash_y_op);
+  // myTTree->Branch("flash_z_op", "std::vector< double >", &_flash_z_op);
 
   _run_subrun_list_file.open("run_subrun_list_filter.txt", std::ofstream::out | std::ofstream::trunc);
 
@@ -115,14 +115,14 @@ void generatorLevelAnalyzer::clear()
   _flash_y_simple.clear();
   _flash_z_simple.clear();
 
-  _n_flash_op = 0;
-  _n_flash_op_over50 = 0;
-  _n_flash_op_beam = 0;
-  _n_flash_op_over50_beam = 0;
-  _flash_PE_op.clear();
-  _flash_time_op.clear();
-  _flash_y_op.clear();
-  _flash_z_op.clear();
+  // _n_flash_op = 0;
+  // _n_flash_op_over50 = 0;
+  // _n_flash_op_beam = 0;
+  // _n_flash_op_over50_beam = 0;
+  // _flash_PE_op.clear();
+  // _flash_time_op.clear();
+  // _flash_y_op.clear();
+  // _flash_z_op.clear();
 }
 
 void generatorLevelAnalyzer::opticalInformation(art::Event const &evt)
@@ -147,25 +147,25 @@ void generatorLevelAnalyzer::opticalInformation(art::Event const &evt)
     }
   }
 
-  art::InputTag optical_tag_op{"opflashBeam"};
-  auto const &optical_handle_op = evt.getValidHandle<std::vector<recob::OpFlash>>(optical_tag_op);
-
-  for (unsigned int ifl = 0; ifl < optical_handle_op->size(); ++ifl)
-  {
-    recob::OpFlash const &flash = optical_handle_op->at(ifl);
-    _flash_PE_op.push_back(flash.TotalPE());
-    _flash_time_op.push_back(flash.Time());
-    _flash_y_op.push_back(flash.YCenter());
-    _flash_z_op.push_back(flash.ZCenter());
-
-    _n_flash_op ++;
-    if (flash.TotalPE() > 50) _n_flash_op_over50 ++;
-    if (flash.Time() > m_beamStart && flash.Time() < m_beamEnd)
-    {
-      _n_flash_op_beam ++;
-      if (flash.TotalPE() > 50) _n_flash_op_over50_beam ++;
-    }
-  }
+  // art::InputTag optical_tag_op{"opflashBeam"};
+  // auto const &optical_handle_op = evt.getValidHandle<std::vector<recob::OpFlash>>(optical_tag_op);
+  //
+  // for (unsigned int ifl = 0; ifl < optical_handle_op->size(); ++ifl)
+  // {
+  //   recob::OpFlash const &flash = optical_handle_op->at(ifl);
+  //   _flash_PE_op.push_back(flash.TotalPE());
+  //   _flash_time_op.push_back(flash.Time());
+  //   _flash_y_op.push_back(flash.YCenter());
+  //   _flash_z_op.push_back(flash.ZCenter());
+  //
+  //   _n_flash_op ++;
+  //   if (flash.TotalPE() > 50) _n_flash_op_over50 ++;
+  //   if (flash.Time() > m_beamStart && flash.Time() < m_beamEnd)
+  //   {
+  //     _n_flash_op_beam ++;
+  //     if (flash.TotalPE() > 50) _n_flash_op_over50_beam ++;
+  //   }
+  // }
 }
 
 void generatorLevelAnalyzer::analyze(art::Event const &evt)
